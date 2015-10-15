@@ -8,6 +8,9 @@
 
 import Foundation
 
+
+/* MONEY */
+
 struct Money {
     // properties
     var amount: Double
@@ -108,7 +111,7 @@ struct Money {
 var mon1 = Money(amount: 5.00, currency: "CAN")
 var mon2 = Money(amount: 1.00, currency: "USD")
 
-// testing 
+// testing
 print(mon1.convert("USD"))
 print(mon2.convert("CAN"))
 
@@ -117,3 +120,108 @@ print(mon1.subtract(mon2))
 
 
 
+
+
+
+
+
+/* JOB */
+
+class Job {
+    // properties
+    var title: String
+    var salary: Double
+
+    // salary = per hour
+    // 2000 hours / year
+    init(title: String, salary: Double) {
+        self.title = title
+        self.salary = salary
+    }
+    
+    func calculateIncome(hoursWorked: Int) -> Double {
+        return salary * Double(hoursWorked)
+    }
+    
+    func raise(percentage: Double) {
+        return salary *= (1 + percentage)
+    }
+}
+
+
+
+
+
+/* PERSON */
+
+class Person {
+    // properties
+    var firstName: String
+    var lastName: String
+    var age: Int
+    var job: Job?
+    var spouse: Person?
+    
+    
+    // under 16, cannot have job
+    // under 18, cannot have spouse
+    
+    init(firstName: String, lastName: String, age: Int, job: Job?, spouse: Person) {
+        self.firstName = firstName
+        self.lastName = lastName
+        self.age = age
+        
+        if age < 16 {
+            print("Person under the age 16 cannot have a job.")
+        } else {
+            self.job = job
+        }
+        
+        if age < 18 {
+            print("Person under the age 16 cannot have a spouse.")
+        } else {
+            self.spouse = spouse
+        }
+    }
+    
+    func toString() -> String {
+        var personString: String
+        if self.job != nil && self.spouse != nil {
+            personString = ("Name: \(firstName) \(lastName) Age: \(age) Job: \(job!.title) Spouse: \(spouse!.firstName)")
+        } else if self.job != nil {
+            personString = ("Name: \(firstName) \(lastName) Age: \(age) Job: \(job!.title)")
+        } else if self.spouse != nil {
+            personString = ("Name: \(firstName) \(lastName) Age: \(age) Spouse: \(spouse!.firstName)")
+        } else {
+            personString = ("Name: \(firstName) \(lastName) Age: \(age)")
+        }
+        return personString
+    }
+}
+
+
+
+/* FAMILY */
+
+class Family {
+    // properties
+    var members: [Person]
+    
+    init(members: [Person]) {
+        self.members = members
+    }
+    
+    func householdIncome() -> Double {
+        var totalIncome: Double = 0.0
+        for member in members {
+            if member.job != nil {
+                totalIncome += member.job!.calculateIncome(2000)
+            }
+        }
+        return totalIncome
+    }
+    
+    func haveChild() {
+        
+    }
+}
