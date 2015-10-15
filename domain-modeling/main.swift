@@ -111,6 +111,7 @@ var mon2 = Money(amount: 1.00, currency: "USD")
 var mon3 = Money(amount: 1.50, currency: "EUR")
 var mon4 = Money(amount: 1.50, currency: "CAN")
 var bad1 = Money(amount: 12.34, currency: "ABC")
+print("")
 
 print("Convert Money")
 print(mon1.convert("USD")) // 5 CAN -> 4 USD
@@ -173,6 +174,7 @@ print(job2.salary) // 52.50 -> raise 25% = 65.625
 print(job1.calculateIncome(2000))
 print(job2.calculateIncome(2000))
 print(job3.calculateIncome(2000))
+print("")
 print("")
 
 
@@ -237,6 +239,7 @@ p1.toString()
 p2.toString()
 p3.toString()
 p4.toString()
+print("")
 print("")
 
 
