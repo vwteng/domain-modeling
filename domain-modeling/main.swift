@@ -25,6 +25,7 @@ struct Money {
         }
     }
 
+    // converts Money to a given new currency and returns a new Money
     func convert(newCurrency: String) -> Money {
         var convertedMoney = Money(amount: self.amount, currency: newCurrency)
         switch newCurrency {
@@ -138,17 +139,34 @@ class Job {
     // properties
     var title: String
     var salary: Double
+    var hourly: Bool
 
     // salary = per hour
     // 2000 hours / year
-    init(title: String, salary: Double) {
+    // hourly is a Boolean, if salary is hourly then true, if salary is yearly then false
+    init(title: String, salary: Double, hourly: Bool) {
         self.title = title
         self.salary = salary
+        self.hourly = hourly
     }
+
     
     // returns the income based on hours worked
-    func calculateIncome(hoursWorked: Int) -> Double {
-        return salary * Double(hoursWorked)
+    func calculateIncome(hoursWorked: Int?) -> Double {
+        if hourly {
+            if hoursWorked != nil {
+                return salary * Double(hoursWorked!)
+            } else {
+                print("Hours worked need to be entered to calculate the income of a job with a hourly salary.")
+                return 0
+            }
+        } else {
+            return salary
+        }
+    }
+    
+    func calculateIncome() -> Double {
+        return self.calculateIncome(nil)
     }
     
     // takes in percentage raised as a decimal and updates the salary in Job
@@ -160,20 +178,20 @@ class Job {
 // TESTING FOR JOB
 
 print("TEST FOR JOB")
-var job1 = Job(title: "Doctor", salary: 95.00)
-var job2 = Job(title: "Engineer", salary: 52.50)
-var job3 = Job(title: "Teacher", salary: 35.49)
+var job1 = Job(title: "Doctor", salary: 95.00, hourly: true)
+var job2 = Job(title: "Engineer", salary: 52.50, hourly: true)
+var job3 = Job(title: "Teacher", salary: 35440.49, hourly: false)
 
-print(job1.calculateIncome(100))
-print(job2.calculateIncome(150))
-print(job3.calculateIncome(253))
+print("With a salary of \(job1.salary), working 100 hours, the income is \(job1.calculateIncome(100))")
+print("With a salary of \(job2.salary), working 150 hours, the income is \(job2.calculateIncome(150))")
+print(job2.calculateIncome()) // hourly wage without hours worked entered -> fail
+print("With a yearly salary of \(job3.salary), the income is \(job3.calculateIncome())")
 job1.raise(0.50)
 job2.raise(0.25)
+print("")
+print("Salary after raises")
 print(job1.salary) // 95 -> raised 50% = 142.50
 print(job2.salary) // 52.50 -> raise 25% = 65.625
-print(job1.calculateIncome(2000))
-print(job2.calculateIncome(2000))
-print(job3.calculateIncome(2000))
 print("")
 print("")
 
@@ -212,6 +230,18 @@ class Person {
         }
     }
     
+    convenience init(firstName: String, lastName: String, age: Int, job: Job?) {
+        self.init(firstName: firstName, lastName: lastName, age: age, job: job, spouse: nil)
+    }
+    
+    convenience init(firstName: String, lastName: String, age: Int, spouse: Person?) {
+        self.init(firstName: firstName, lastName: lastName, age: age, job: nil, spouse: spouse)
+    }
+    
+    convenience init(firstName: String, lastName: String, age: Int) {
+        self.init(firstName: firstName, lastName: lastName, age: age, job: nil, spouse: nil)
+    }
+    
     func toString() {
         if self.job != nil && self.spouse != nil {
             print("My name is \(firstName) \(lastName) and I am \(age) years old. My job is \(job!.title) and my spouse is \(spouse!.firstName).")
@@ -228,17 +258,21 @@ class Person {
 // TESTING FOR PERSON
 
 print("TEST FOR PERSON")
-var p1 = Person(firstName: "John", lastName: "Smith", age: 25, job: job1, spouse: nil)
+var p1 = Person(firstName: "John", lastName: "Smith", age: 25, job: job1)
 var p2 = Person(firstName: "Bob", lastName: "Armstrong", age: 12, job: nil, spouse: nil)
 var p3 = Person(firstName: "Anna", lastName: "McDonald", age: 38, job: job2, spouse: nil)
 var p4 = Person(firstName: "Henry", lastName: "David", age: 42, job: job3, spouse: p3)
-var illegal1 = Person(firstName: "Anna", lastName: "McDonald", age: 13, job: job2, spouse: nil)
-var illegal2 = Person(firstName: "Henry", lastName: "David", age: 10, job: nil, spouse: p3)
+var p5 = Person(firstName: "George", lastName: "Michaels", age: 5)
 
 p1.toString()
 p2.toString()
 p3.toString()
 p4.toString()
+p5.toString()
+
+var illegal1 = Person(firstName: "Anna", lastName: "McDonald", age: 13, job: job2, spouse: nil)
+var illegal2 = Person(firstName: "Henry", lastName: "David", age: 10, job: nil, spouse: p3)
+
 print("")
 print("")
 
@@ -260,7 +294,11 @@ class Family {
         var totalIncome: Double = 0.0
         for member in members {
             if member.job != nil {
-                totalIncome += member.job!.calculateIncome(2000)
+                if member.job!.hourly {
+                    totalIncome += member.job!.calculateIncome(2000)
+                } else {
+                    totalIncome += member.job!.calculateIncome()
+                }
             }
         }
         return totalIncome
@@ -287,9 +325,12 @@ class Family {
 
 print("TEST FOR FAMILY")
 var fam = Family(members: [p1, p2, p3, p4])
-print(fam.householdIncome())
+print("The household income total is \(fam.householdIncome())")
+print("This family has \(fam.members.count) members")
 fam.haveChild("Samantha", lastName: "Jones")
+print("After having a child, the family has \(fam.members.count) members")
+print("")
 
 var fam2 = Family(members: [illegal1, illegal2])
-print(fam2.householdIncome())
+print("The household income total is \(fam2.householdIncome())") // nobody is working, so 0 income
 fam2.haveChild("Daniel", lastName: "Tate")
