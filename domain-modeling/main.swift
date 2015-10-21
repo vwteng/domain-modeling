@@ -9,9 +9,29 @@
 import Foundation
 
 
+/* MATHEMATICS PROTOCOL */
+
+protocol Mathematics {
+    func add(money2: Money) -> Money
+    func subtract(money2: Money) -> Money
+}
+
+
+
+/* DOUBLE EXTENSION */
+
+extension Double {
+    var USD: Money { return Money(amount: self, currency: "USD") }
+    var GBP: Money { return Money(amount: self, currency: "GBP") }
+    var EUR: Money { return Money(amount: self, currency: "EUR") }
+    var CAN: Money { return Money(amount: self, currency: "CAN") }
+}
+
+
+
 /* MONEY */
 
-struct Money {
+struct Money: CustomStringConvertible, Mathematics {
     // properties
     var amount: Double
     var currency: String
@@ -23,6 +43,10 @@ struct Money {
         if (currency != "USD" && currency != "GBP" && currency != "EUR" && currency != "CAN") {
             print("Only the following currencies are accepted: USD, GBP, EUR or CAN")
         }
+    }
+    
+    var description: String {
+        return currency + "\(amount)"
     }
 
     // converts Money to a given new currency and returns a new Money
@@ -133,9 +157,10 @@ print("")
 
 
 
+
 /* JOB */
 
-class Job {
+class Job: CustomStringConvertible {
     // properties
     var title: String
     var salary: Double
@@ -149,7 +174,10 @@ class Job {
         self.salary = salary
         self.hourly = hourly
     }
-
+    
+    var description: String {
+        return title + "\(salary)"
+    }
     
     // returns the income based on hours worked
     func calculateIncome(hoursWorked: Int?) -> Double {
@@ -201,14 +229,13 @@ print("")
 
 /* PERSON */
 
-class Person {
+class Person: CustomStringConvertible {
     // properties
     var firstName: String
     var lastName: String
     var age: Int
     var job: Job?
     var spouse: Person?
-    
     
     // under 16, cannot have job
     // under 18, cannot have spouse
@@ -228,6 +255,10 @@ class Person {
         } else {
             self.spouse = spouse
         }
+    }
+    
+    var description: String {
+        return firstName + lastName
     }
     
     convenience init(firstName: String, lastName: String, age: Int, job: Job?) {
@@ -281,12 +312,16 @@ print("")
 
 /* FAMILY */
 
-class Family {
+class Family: CustomStringConvertible {
     // properties
     var members: [Person]
     
     init(members: [Person]) {
         self.members = members
+    }
+    
+    var description: String {
+        return "\(members)"
     }
     
     // returns total income for one year/2000 hours
@@ -334,3 +369,25 @@ print("")
 var fam2 = Family(members: [illegal1, illegal2])
 print("The household income total is \(fam2.householdIncome())") // nobody is working, so 0 income
 fam2.haveChild("Daniel", lastName: "Tate")
+
+
+
+
+
+
+// TESTING FOR PART 2
+print("")
+print("")
+print(mon1)
+print(mon1.description)
+print(job1)
+print(fam)
+print(p1)
+print("")
+
+print(mon1.add(mon2))
+print(5.USD.add(5.CAN))
+print(5.CAN)
+print(150.34.CAN)
+print(104.12.EUR.add(44.23.GBP))
+print(9940.34.EUR.subtract(44.GBP))
